@@ -1,10 +1,10 @@
 import { Board } from '@/components/Board.tsx';
-import { GameContextProvider } from './contexts/GameContext.tsx';
+import { ArbiterContextProvider } from './contexts/Arbiter.tsx';
 
 export function App() {
   return (
-    <GameContextProvider>
+    <ArbiterContextProvider>
       <Board />
-    </GameContextProvider>
+    </ArbiterContextProvider>
   );
 }

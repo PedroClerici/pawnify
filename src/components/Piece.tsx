@@ -1,4 +1,4 @@
-import { useArbiter } from '../hooks/useArbiter/mod.ts';
+import { useArbiter } from '@/contexts/Arbiter.tsx';
 import type { FENChar } from '../types/piece.ts';
 
 type Props = {
@@ -20,8 +20,6 @@ export function Piece({ rank, file, piece }: Props) {
 
     // console.log(`y: ${rank} x: ${file}`);
     generateCandidateMoves(piece, rank, file);
-
-    console.log(color, isDraggable, piece);
   }
 
   function handleDragEnd(event: DragEvent) {

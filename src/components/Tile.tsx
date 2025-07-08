@@ -1,5 +1,5 @@
 import { useComputed } from '@preact/signals';
-import { useArbiter } from '../hooks/useArbiter/mod.ts';
+import { useArbiter } from '@/contexts/Arbiter.tsx';
 import type { FENChar } from '../types/piece.ts';
 import { Piece } from './Piece.tsx';
 
