@@ -1,0 +1,26 @@
+{
+  "tasks": {
+    "dev": "deno run -A --node-modules-dir npm:vite",
+    "build": "deno run -A --node-modules-dir npm:vite build",
+    "preview": "deno run -A --node-modules-dir npm:vite preview",
+    "serve": "deno run --allow-net --allow-read jsr:@std/http@1/file-server dist/"
+  },
+  "compilerOptions": {
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact"
+  },
+  "imports": {
+    "@/": "./src/",
+    "@biomejs/biome": "npm:@biomejs/biome@^2.0.6",
+    "@deno/vite-plugin": "npm:@deno/vite-plugin@^1.0.4",
+    "@preact/preset-vite": "npm:@preact/preset-vite@^2.10.1",
+    "@preact/signals": "npm:@preact/signals@^2.2.1",
+    "@prefresh/vite": "npm:@prefresh/vite@^2.4.8",
+    "@unocss/transformer-attributify-jsx": "npm:@unocss/transformer-attributify-jsx@^66.3.3",
+    "preact": "npm:preact@^10.26.2",
+    "unocss": "npm:unocss@^66.3.3",
+    "vite": "npm:vite@^6.1.1"
+  },
+  "nodeModulesDir": "auto"
+}
