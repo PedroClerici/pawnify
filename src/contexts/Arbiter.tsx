@@ -1,4 +1,4 @@
-import { batch, type ReadonlySignal, signal } from '@preact/signals';
+import { batch, type ReadonlySignal, useSignal } from '@preact/signals';
 import type { ComponentChildren } from 'preact';
 import { createContext } from 'preact';
 import { useContext } from 'preact/hooks';
@@ -6,18 +6,25 @@ import {
   getBishopMoves,
   getKingMoves,
   getKnightMoves,
+  getPawnMoves,
   getQueenMoves,
   getRookMoves,
 } from '@/moves/mod.ts';
 import type { FENChar } from '@/types/piece.ts';
-import { convertToFen } from '@/utils/convert-to-fen.ts';
 import { createPositions } from '@/utils/create-positions.ts';
+import type { Move } from '../types/move.ts';
+import type { Vector2 } from '../types/vector2.ts';
 
 type ArbiterContextType = {
   positions: ReadonlySignal<FENChar[][]>;
-  candidateMoves: ReadonlySignal<number[][]>;
+  previousPositions: ReadonlySignal<FENChar[][]>;
+  candidateMoves: ReadonlySignal<Move[]>;
   turn: ReadonlySignal<'black' | 'white'>;
-  doMove: (newPositions: FENChar[][]) => void;
+  doMove: (
+    piece: FENChar,
+    from: { x: number; y: number },
+    to: { x: number; y: number },
+  ) => void;
   generateCandidateMoves: (piece: FENChar, rank: number, file: number) => void;
   clearCandidateMoves: () => void;
 };
@@ -29,21 +36,49 @@ type Props = {
 };
 
 export function ArbiterContextProvider({ children }: Props) {
-  const positions = signal(createPositions());
-  const turn = signal<'black' | 'white'>('white');
-  const candidateMoves = signal<number[][]>([]);
+  const previousPositions = useSignal<FENChar[][]>([]);
+  const positions = useSignal(createPositions());
+  const turn = useSignal<'black' | 'white'>('white');
+  const candidateMoves = useSignal<Move[]>([]);
 
-  function doMove(newPositions: FENChar[][]) {
+  function doMove(piece: FENChar, from: Vector2, to: Vector2) {
+    // console.log(from);
+    // console.log(to);
+    const updatedPositions = structuredClone(positions.value);
+
+    const move = candidateMoves.value.find(
+      (move) => move.coords.y === to.y && move.coords.x === to.x,
+    );
+
+    if (!move || move.type === 'enPassant') {
+      return;
+    }
+
+    const enPassant = candidateMoves.value.find(
+      (move) => move.type === 'enPassant',
+    );
+
+    if (move.type === 'move' || move.type === 'capture') {
+      updatedPositions[from.y][from.x] = '';
+      updatedPositions[to.y][to.x] = piece;
+
+      if (enPassant) {
+        updatedPositions[enPassant.coords.y][enPassant.coords.x] = '';
+      }
+    }
+
     batch(() => {
-      positions.value = newPositions;
+      previousPositions.value = structuredClone(positions.value);
+      positions.value = updatedPositions;
       turn.value = turn.value === 'white' ? 'black' : 'white';
       candidateMoves.value = [];
     });
 
     // Debug only!
-    console.log(turn.value);
-    console.log(positions.value);
-    console.log(convertToFen(positions.value));
+    // console.log(previousPositions.value);
+    // console.log(positions.value);
+    // console.log(convertToFen(positions.value));
+    // console.log(turn.value);
   }
 
   function generateCandidateMoves(piece: FENChar, rank: number, file: number) {
@@ -63,6 +98,18 @@ export function ArbiterContextProvider({ children }: Props) {
 
     if (pieceType === 'k')
       candidateMoves.value = getKingMoves(positions.value, piece, rank, file);
+
+    if (pieceType === 'p') {
+      candidateMoves.value = getPawnMoves(
+        positions.value,
+        previousPositions.value,
+        piece,
+        rank,
+        file,
+      );
+    }
+
+    console.log(candidateMoves.value);
   }
 
   function clearCandidateMoves() {
@@ -72,6 +119,7 @@ export function ArbiterContextProvider({ children }: Props) {
   return (
     <ArbiterContext.Provider
       value={{
+        previousPositions,
         positions,
         candidateMoves,
         turn,

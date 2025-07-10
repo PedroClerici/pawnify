@@ -1,6 +1,7 @@
 import { useComputed } from '@preact/signals';
 import { useArbiter } from '@/contexts/Arbiter.tsx';
 import type { FENChar } from '../types/piece.ts';
+import { Highlight } from './Highlight.tsx';
 import { Piece } from './Piece.tsx';
 
 type Props = {
@@ -15,29 +16,12 @@ export function Tile({ file, rank }: Props) {
 
   const piece = useComputed(() => positions.value[rank][file]);
 
-  const isValidMove = useComputed(() =>
-    candidateMoves.value.find((move) => move[0] === rank && move[1] === file),
+  const moveType = useComputed(
+    () =>
+      candidateMoves.value.find(
+        (move) => move.coords.x === file && move.coords.y === rank,
+      )?.type,
   );
-
-  const highlightType = useComputed(() => {
-    if (!isValidMove.value) {
-      return null;
-    }
-
-    if (positions.value[rank][file]) {
-      return 'attacking';
-    }
-
-    return 'highlight';
-  });
-
-  const highlights = {
-    attacking:
-      'absolute inset-0 size-full border-10 rounded-full border-black opacity-25',
-    highlight:
-      'absolute m-auto inset-0 size-1/3 rounded-full bg-black opacity-25',
-    '': '',
-  };
 
   const fileChar = String.fromCharCode(file + 97);
   const rankChar = Math.abs(rank - 8);
@@ -46,22 +30,16 @@ export function Tile({ file, rank }: Props) {
       ? 'bg-tile-dark text-tile-light'
       : 'bg-tile-light text-tile-dark';
 
-  // TODO: Transfer move validation logic to useArbiter
   function handleDrop(event: DragEvent) {
-    if (!isValidMove.value) {
-      return;
-    }
-
-    const updatedPositions = [...positions.value];
-
     const [piece, originalRank, originalFile] = event
       .dataTransfer!.getData('text')
       .split(',');
 
-    updatedPositions[+originalRank][+originalFile] = '';
-    updatedPositions[rank][file] = piece as FENChar;
-
-    doMove(updatedPositions);
+    doMove(
+      piece as FENChar,
+      { y: +originalRank, x: +originalFile },
+      { y: rank, x: file },
+    );
   }
 
   function handleDragOver(event: DragEvent) {
@@ -73,7 +51,8 @@ export function Tile({ file, rank }: Props) {
       className={tileClass}
       relative
       size="25"
-      font-medium
+      font="medium"
+      select="none"
       onDrop={handleDrop}
       onDragOver={handleDragOver}
     >
@@ -87,9 +66,7 @@ export function Tile({ file, rank }: Props) {
         <Piece rank={rank} file={file} piece={piece.value} />
       ) : null}
 
-      {isValidMove.value ? (
-        <span className={highlights[highlightType.value!]} />
-      ) : null}
+      {moveType.value ? <Highlight type={moveType.value} /> : null}
 
       {rank === 7 ? (
         <span absolute leading-none bottom="1.5" right="1.5">

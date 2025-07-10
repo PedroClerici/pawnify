@@ -7,6 +7,7 @@ declare module 'preact' {
       bottom?: string;
       left?: string;
       right?: string;
+      inset?: string;
     }
   }
 }

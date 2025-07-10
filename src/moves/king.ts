@@ -1,4 +1,6 @@
+import type { Move } from '@/types/move.ts';
 import type { FENChar } from '@/types/piece.ts';
+import type { Vector2 } from '@/types/vector2.ts';
 
 export function getKingMoves(
   positions: FENChar[][],
@@ -6,41 +8,46 @@ export function getKingMoves(
   rank: number,
   file: number,
 ) {
-  const moves: number[][] = [];
+  const moves: Move[] = [];
   const ourColor = piece === piece.toLowerCase() ? 'black' : 'white';
   const enemyColor = ourColor === 'white' ? 'black' : 'white';
 
-  const directions = [
-    [-1, 0],
-    [1, 0],
-    [0, -1],
-    [0, 1],
-    [-1, -1],
-    [-1, 1],
-    [1, -1],
-    [1, 1],
+  const directions: Vector2[] = [
+    { x: -1, y: -1 },
+    { x: 0, y: -1 },
+    { x: -1, y: 0 },
+    { x: 1, y: -1 },
+    { x: -1, y: 1 },
+    { x: 0, y: 1 },
+    { x: 1, y: 0 },
+    { x: 1, y: 1 },
   ];
 
   for (const direction of directions) {
-    const y = rank + direction[0];
-    const x = file + direction[1];
-    const isOutOfBounds = positions?.[y]?.[x] === undefined;
-    const isEmptyTile = !isOutOfBounds && positions[y][x] === '';
+    const coords = {
+      x: file + direction.x,
+      y: rank + direction.y,
+    };
+    const isOutOfBounds = positions?.[coords.y]?.[coords.x] === undefined;
+    const isEmptyTile = !isOutOfBounds && positions[coords.y][coords.x] === '';
 
     if (isOutOfBounds) {
       continue;
     }
 
     if (isEmptyTile) {
-      moves.push([y, x]);
+      moves.push({ coords, type: 'move' });
       continue;
     }
 
     const pieceColor =
-      positions[y][x] === positions[y][x].toLowerCase() ? 'black' : 'white';
+      positions[coords.y][coords.x] ===
+      positions[coords.y][coords.x].toLowerCase()
+        ? 'black'
+        : 'white';
 
     if (pieceColor === enemyColor) {
-      moves.push([y, x]);
+      moves.push({ coords, type: 'capture' });
     }
   }
 
