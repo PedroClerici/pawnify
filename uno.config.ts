@@ -1,6 +1,8 @@
 import transformerAttributifyJsx from '@unocss/transformer-attributify-jsx';
 import { defineConfig, presetAttributify, presetWind4 } from 'unocss';
 
+const FENChars = ['r', 'n', 'b', 'q', 'k', 'p', 'R', 'N', 'B', 'Q', 'K', 'P'];
+
 export default defineConfig({
   theme: {
     colors: {
@@ -11,4 +13,5 @@ export default defineConfig({
   },
   presets: [presetAttributify(), presetWind4()],
   transformers: [transformerAttributifyJsx()],
+  safelist: FENChars.map((piece) => `bg-[url(/pieces/${piece}.png)]`),
 });

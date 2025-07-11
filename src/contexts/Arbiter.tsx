@@ -108,8 +108,6 @@ export function ArbiterContextProvider({ children }: Props) {
         file,
       );
     }
-
-    console.log(candidateMoves.value);
   }
 
   function clearCandidateMoves() {

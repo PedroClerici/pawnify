@@ -5,10 +5,10 @@ export function createPositions() {
     .fill('')
     .map(() => Array(8).fill(''));
 
-  // for (let i = 0; i < 8; i++) {
-  //   positions[1][i] = 'p';
-  //   positions[6][i] = 'P';
-  // }
+  for (let i = 0; i < 8; i++) {
+    positions[1][i] = 'p';
+    positions[6][i] = 'P';
+  }
 
   positions[0][0] = 'r';
   positions[0][1] = 'n';

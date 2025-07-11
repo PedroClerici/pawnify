@@ -1,5 +1,6 @@
 import { useArbiter } from '@/contexts/Arbiter.tsx';
 import type { FENChar } from '../types/piece.ts';
+import type { Vector2 } from '../types/vector2.ts';
 
 type Props = {
   rank: number;
@@ -13,9 +14,18 @@ export function Piece({ rank, file, piece }: Props) {
   const isDraggable = turn.value === color;
 
   function handleDragStart(event: DragEvent) {
+    const target = event.target as HTMLDivElement;
+
+    const position: Vector2 = {
+      x: target.offsetWidth / 2,
+      y: target.offsetHeight / 2,
+    };
+
+    event.dataTransfer?.setDragImage(target, position.x, position.y);
     event.dataTransfer?.setData('text/plain', `${piece},${rank},${file}`);
+
     setTimeout(() => {
-      (event.target as HTMLImageElement).style.display = 'none';
+      target.style.display = 'none';
     });
 
     // console.log(`y: ${rank} x: ${file}`);
@@ -28,12 +38,11 @@ export function Piece({ rank, file, piece }: Props) {
   }
 
   return (
-    <img
-      relative
+    <div
+      absolute
       size="full"
       z="1"
-      src={`/pieces/${piece}.png`}
-      alt={piece}
+      className={`bg-[url(/pieces/${piece}.png)] bg-cover`}
       draggable={isDraggable}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}

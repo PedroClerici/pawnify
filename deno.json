@@ -17,6 +17,7 @@
     "@preact/preset-vite": "npm:@preact/preset-vite@^2.10.1",
     "@preact/signals": "npm:@preact/signals@^2.2.1",
     "@prefresh/vite": "npm:@prefresh/vite@^2.4.8",
+    "@std/fs": "jsr:@std/fs@^1.0.19",
     "@unocss/transformer-attributify-jsx": "npm:@unocss/transformer-attributify-jsx@^66.3.3",
     "preact": "npm:preact@^10.26.2",
     "unocss": "npm:unocss@^66.3.3",
